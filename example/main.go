@@ -12,10 +12,10 @@ import (
 
 func main() {
 	healthChecker := status.NewHealthChecker().
-		WithTarget("db", status.TargetImportanceHigh, func(ctx context.Context) error {
+		WithTarget("db", status.TargetImportanceHigh, func(_ context.Context) error {
 			return generateRandomError()
 		}).
-		WithTarget("network", status.TargetImportanceLow, func(ctx context.Context) error {
+		WithTarget("network", status.TargetImportanceLow, func(_ context.Context) error {
 			return generateRandomError()
 		})
 
@@ -30,7 +30,11 @@ func main() {
 	http.HandleFunc("/health", healthChecker.Handler())
 	http.HandleFunc("/status", statusPage.Handler())
 
-	http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Printf("serving http: %v", err)
+		return
+	}
 }
 
 func generateRandomError() error {

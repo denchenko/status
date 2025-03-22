@@ -51,15 +51,22 @@ func (p *Page) WithURL(name, url string) {
 }
 
 func (p *Page) Handler() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		version, revision, commitDate := retrieveBuildInfo()
 		data := struct {
-			Title   string
-			Heading string
-			Message string
+			Title      string
+			Heading    string
+			Message    string
+			Version    string
+			Revision   string
+			CommitDate string
 		}{
-			Title:   "Welcome Page",
-			Heading: "Hello, World!",
-			Message: "This is a simple Go HTML template example.",
+			Title:      "Welcome Page",
+			Heading:    "Hello, World!",
+			Message:    "This is a simple Go HTML template example.",
+			Version:    version,
+			Revision:   revision,
+			CommitDate: commitDate,
 		}
 		w.Header().Set("Content-Type", "text/html")
 		err := p.tmpl.Execute(w, data)

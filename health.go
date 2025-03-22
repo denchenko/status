@@ -54,7 +54,7 @@ func (c *HealthChecker) Handler() http.HandlerFunc {
 
 		results, err := c.Check(ctx)
 		if err != nil {
-			respondJSON(ctx, w, http.StatusInternalServerError, err)
+			respondJSON(w, http.StatusInternalServerError, err)
 			return
 		}
 
@@ -68,7 +68,7 @@ func (c *HealthChecker) Handler() http.HandlerFunc {
 			}
 		}
 
-		respondJSON(ctx, w, status, results)
+		respondJSON(w, status, results)
 	})
 }
 
@@ -92,8 +92,6 @@ func (c *HealthChecker) Check(ctx context.Context) ([]HealthCheckResult, error) 
 	g, ctx := errgroup.WithContext(ctx)
 
 	for i, target := range c.targets {
-		i, target := i, target
-
 		g.Go(func() error {
 			err := target.check(ctx)
 			if err != nil {
@@ -103,12 +101,11 @@ func (c *HealthChecker) Check(ctx context.Context) ([]HealthCheckResult, error) 
 					err:          err,
 					ErrorMessage: err.Error(),
 				}
-				return nil
-			}
-
-			results[i] = HealthCheckResult{
-				Target: target,
-				Status: HealthTargetStatusOk,
+			} else {
+				results[i] = HealthCheckResult{
+					Target: target,
+					Status: HealthTargetStatusOk,
+				}
 			}
 
 			return nil
@@ -125,7 +122,7 @@ func (c *HealthChecker) Check(ctx context.Context) ([]HealthCheckResult, error) 
 
 // respondJSON responds JSON body with a given code. It sets
 // Content-Type header.
-func respondJSON(ctx context.Context, w http.ResponseWriter, code int, data any) {
+func respondJSON(w http.ResponseWriter, code int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	if err := json.NewEncoder(w).Encode(&data); err != nil {
