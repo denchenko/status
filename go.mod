@@ -1,4 +1,4 @@
-module github.com/gostatus/status
+module github.com/denchenko/status
 
 go 1.24.1
 

@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 
-	"github.com/gostatus/status"
+	"github.com/denchenko/status"
 )
 
 func main() {
