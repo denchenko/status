@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.Title}}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .status-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .status-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-item.ok {
+            border-left: 4px solid #28a745;
+        }
+        .status-item.fail {
+            border-left: 4px solid #dc3545;
+        }
+        .nav-links {
+            margin-top: 20px;
+        }
+        .nav-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .build-info {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{.Heading}}</h1>
+            <p>{{.Message}}</p>
+        </div>
+
+        {{if .HealthResults}}
+        <div class="status-section">
+            <h2>System Status</h2>
+            <div class="status-grid">
+                {{range .HealthResults}}
+                <div class="status-item {{if eq .Status "ok"}}ok{{else}}fail{{end}}">
+                    <h3>{{.Target.Name}}</h3>
+                    <p>Status: <strong>{{.Status}}</strong></p>
+                    {{if .ErrorMessage}}
+                    <p>Error: {{.ErrorMessage}}</p>
+                    {{end}}
+                    {{if .Duration}}
+                    <p>Response time: {{.Duration}}</p>
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        {{if .URLs}}
+        <div class="nav-links">
+            <h2>Quick Links</h2>
+            {{range .URLs}}
+            <a href="{{.URL}}">{{.Name}}</a>
+            {{end}}
+        </div>
+        {{end}}
+
+        <div class="build-info">
+            <p>Version: {{.Version}}</p>
+            <p>Revision: {{.Revision}}</p>
+            <p>Build Date: {{.CommitDate}}</p>
+        </div>
+    </div>
+</body>
+</html>

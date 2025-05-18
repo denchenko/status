@@ -1,13 +1,20 @@
 # status
 
 [![Run Tests](https://github.com/denchenko/status/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/denchenko/status/actions/workflows/go.yml)
-[![codecov](https://codecov.io/gh/denchenko/status/branch/master/graph/badge.svg)](https://codecov.io/gh/denchenko/status)
 [![Go Report Card](https://goreportcard.com/badge/github.com/denchenko/status)](https://goreportcard.com/report/github.com/denchenko/status)
 [![GoDoc](https://godoc.org/github.com/denchenko/status?status.svg)](https://godoc.org/github.com/denchenko/status)
 
-# Example
+A Go package for health checking and status page generation. It provides a simple way to monitor the health of various dependencies and services in your application, with a status page dashboard.
 
+## Installation
+
+```bash
+go get github.com/denchenko/status
 ```
+
+## Usage
+
+```go
 package main
 
 import (
@@ -21,26 +28,36 @@ import (
 )
 
 func main() {
+	// Create a health checker
 	healthChecker := status.NewHealthChecker().
-		WithTarget("db", status.TargetImportanceHigh, func(ctx context.Context) error {
+		WithTarget("database", status.TargetImportanceHigh, func(ctx context.Context) error {
+			// Implement your database health check here
 			return generateRandomError()
 		}).
 		WithTarget("network", status.TargetImportanceLow, func(ctx context.Context) error {
+			// Implement your network health check here
 			return generateRandomError()
 		})
 
+	// Create a status page
 	statusPage, err := status.NewPage()
 	if err != nil {
-		log.Printf("constructing page: %v", err)
-		return
+		log.Fatal(err)
 	}
-	statusPage.WithHealthChecker(healthChecker)
-	statusPage.WithURL("Swagger", "/swagger")
 
+	// Add health checker to status page
+	statusPage.WithHealthChecker(healthChecker)
+
+	// Add additional URLs to the status page
+	statusPage.WithURL("OpenAPI Documentation", "/swagger")
+	statusPage.WithURL("Metrics", "/metrics")
+
+	// Set up HTTP handlers
 	http.HandleFunc("/health", healthChecker.Handler())
 	http.HandleFunc("/status", statusPage.Handler())
 
-	http.ListenAndServe(":8080", nil)
+	// Start the server
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func generateRandomError() error {
