@@ -62,8 +62,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>{{.Heading}}</h1>
-            <p>{{.Message}}</p>
+            <h1>{{.Title}}</h1>
         </div>
 
         {{if .HealthResults}}
@@ -86,10 +85,10 @@
         </div>
         {{end}}
 
-        {{if .URLs}}
+        {{if .Links}}
         <div class="nav-links">
             <h2>Quick Links</h2>
-            {{range .URLs}}
+            {{range .Links}}
             <a href="{{.URL}}">{{.Name}}</a>
             {{end}}
         </div>
