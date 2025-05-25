@@ -30,27 +30,23 @@ import (
 func main() {
 	// Create a health checker
 	healthChecker := status.NewHealthChecker().
-		WithTarget("database", status.TargetImportanceHigh, func(ctx context.Context) error {
+		WithTarget("database", status.TargetImportanceHigh, func(_ context.Context) error {
 			// Implement your database health check here
 			return generateRandomError()
 		}).
-		WithTarget("network", status.TargetImportanceLow, func(ctx context.Context) error {
+		WithTarget("network", status.TargetImportanceLow, func(_ context.Context) error {
 			// Implement your network health check here
 			return generateRandomError()
 		})
 
 	// Create a status page
-	statusPage, err := status.NewPage()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Add health checker to status page
-	statusPage.WithHealthChecker(healthChecker)
-
-	// Add additional URLs to the status page
-	statusPage.WithURL("OpenAPI Documentation", "/swagger")
-	statusPage.WithURL("Metrics", "/metrics")
+	statusPage := status.NewPage(
+		// Add health checker to status page
+		status.WithHealthChecker(healthChecker),
+		// Add additional links
+		status.WithLink("OpenAPI Documentation", "/swagger"),
+		status.WithLink("Metrics", "/metrics"),
+	)
 
 	// Set up HTTP handlers
 	http.HandleFunc("/health", healthChecker.Handler())
