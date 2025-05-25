@@ -16,6 +16,9 @@
         }
         .header {
             margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .status-section {
             background: #f8f9fa;
@@ -53,7 +56,6 @@
             text-decoration: underline;
         }
         .build-info {
-            margin-top: 30px;
             font-size: 0.9em;
             color: #666;
         }
@@ -63,11 +65,24 @@
     <div class="container">
         <div class="header">
             <h1>{{.Title}}</h1>
+            {{if .Version}}
+            <div class="build-info">
+                {{.Version}}
+            </div>
+            {{end}}
         </div>
+
+        {{if .Links}}
+        <div class="nav-links">
+            {{range .Links}}
+            <a href="{{.URL}}">{{.Name}}</a>
+            {{end}}
+        </div>
+        {{end}}
 
         {{if .HealthResults}}
         <div class="status-section">
-            <h2>System Status</h2>
+            <h1>Dependencies</h1>
             <div class="status-grid">
                 {{range .HealthResults}}
                 <div class="status-item {{if eq .Status "ok"}}ok{{else}}fail{{end}}">
@@ -84,21 +99,6 @@
             </div>
         </div>
         {{end}}
-
-        {{if .Links}}
-        <div class="nav-links">
-            <h2>Quick Links</h2>
-            {{range .Links}}
-            <a href="{{.URL}}">{{.Name}}</a>
-            {{end}}
-        </div>
-        {{end}}
-
-        <div class="build-info">
-            <p>Version: {{.Version}}</p>
-            <p>Revision: {{.Revision}}</p>
-            <p>Build Date: {{.CommitDate}}</p>
-        </div>
     </div>
 </body>
 </html>

@@ -16,10 +16,11 @@ var (
 
 // Page represents a status page that can be served via HTTP
 type Page struct {
-	title string
-	tmpl  *template.Template
-	hc    *HealthChecker
-	links []Link
+	title       string
+	tmpl        *template.Template
+	hc          *HealthChecker
+	links       []Link
+	showVersion bool
 }
 
 // PageOption is a function that configures a Page
@@ -56,11 +57,19 @@ func WithLink(name, url string) PageOption {
 	}
 }
 
+// WithVersion configures whether to show version information on the status page
+func WithVersion(show bool) PageOption {
+	return func(p *Page) {
+		p.showVersion = show
+	}
+}
+
 // NewPage creates a new status page with the given options
 func NewPage(opts ...PageOption) *Page {
 	p := &Page{
-		title: "System Status",
-		tmpl:  defaultTemplate,
+		title:       "System Status",
+		tmpl:        defaultTemplate,
+		showVersion: true,
 	}
 
 	for _, opt := range opts {
@@ -80,15 +89,13 @@ type Link struct {
 type PageData struct {
 	Title         string
 	Version       string
-	Revision      string
-	CommitDate    string
 	HealthResults []HealthCheckResult
 	Links         []Link
 }
 
 // Handler returns an HTTP handler that serves the status page
 func (p *Page) Handler() http.HandlerFunc {
-	version, revision, commitDate := retrieveBuildInfo()
+	version := retrieveVersion()
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var healthResults []HealthCheckResult
@@ -103,11 +110,12 @@ func (p *Page) Handler() http.HandlerFunc {
 
 		data := PageData{
 			Title:         p.title,
-			Version:       version,
-			Revision:      revision,
-			CommitDate:    commitDate,
 			HealthResults: healthResults,
 			Links:         p.links,
+		}
+
+		if p.showVersion {
+			data.Version = version
 		}
 
 		w.Header().Set("Content-Type", "text/html")
@@ -117,33 +125,13 @@ func (p *Page) Handler() http.HandlerFunc {
 	})
 }
 
-const (
-	vcsRevisionKey = "vcs.revision"
-	vcsTimeKey     = "vcs.time"
-)
-
-func retrieveBuildInfo() (string, string, string) {
-	var (
-		version    = "unknown"
-		revision   = "unknown"
-		commitDate = "unknown"
-	)
+func retrieveVersion() string {
+	var version = "unknown"
 
 	info, ok := debug.ReadBuildInfo()
 	if !ok {
-		return version, revision, commitDate
+		return version
 	}
 
-	version = info.Main.Version
-
-	for i := range info.Settings {
-		switch info.Settings[i].Key {
-		case vcsRevisionKey:
-			revision = info.Settings[i].Value
-		case vcsTimeKey:
-			commitDate = info.Settings[i].Value
-		}
-	}
-
-	return version, revision, commitDate
+	return info.Main.Version
 }
