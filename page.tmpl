@@ -9,6 +9,7 @@
             --accent-color: #0066cc;
             --success-color: #2e7d32;
             --error-color: #c62828;
+            --warning-color: #f57c00;
             --border-color: #e0e0e0;
         }
 
@@ -112,6 +113,10 @@
             border-left: 4px solid var(--error-color);
         }
 
+        .status-item.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+
         .status-item strong {
             color: var(--accent-color);
         }
@@ -149,11 +154,11 @@
         <div class="status-section">
             <div class="status-grid">
                 {{range .HealthResults}}
-                <div class="status-item {{if eq .Status "ok"}}ok{{else}}fail{{end}}">
+                <div class="status-item {{if eq .Status "ok"}}ok{{else if eq .Target.Importance "low"}}warning{{else}}fail{{end}}">
                     <h3>{{.Target.Name}}</h3>
                     <p>Status: <strong>{{.Status}}</strong></p>
                     {{if .ErrorMessage}}
-                    <p class="error">Error: {{.ErrorMessage}}</p>
+                    <p class="error">{{if eq .Target.Importance "low"}}Warning: {{else}}Error: {{end}}{{.ErrorMessage}}</p>
                     {{end}}
                     {{if .Duration}}
                     <p class="duration">Response time: {{.Duration}}</p>
