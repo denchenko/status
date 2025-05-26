@@ -1,6 +1,6 @@
 # status
 
-[![Run Tests](https://github.com/denchenko/status/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/denchenko/status/actions/workflows/go.yml)
+[![Run Tests](https://github.com/denchenko/status/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/denchenko/status/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/denchenko/status)](https://goreportcard.com/report/github.com/denchenko/status)
 [![GoDoc](https://godoc.org/github.com/denchenko/status?status.svg)](https://godoc.org/github.com/denchenko/status)
 
